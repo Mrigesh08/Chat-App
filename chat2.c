@@ -72,7 +72,6 @@ struct node *make_node(char *user_id,int type,char of){
 int search_user(struct node *arr,char *ch){
 	int i=0;
 	while(i<100 && arr[i].type!=-1){
-		printf("in search user== %s.\n",arr[i].user_id);
 		if(strcmp(arr[i].user_id,ch)==0){
 			return arr[i].type;
 		}
@@ -85,7 +84,6 @@ int search_user(struct node *arr,char *ch){
 int search_grp(struct grp *arr,char *ch){
 	int i=0;
 	while(i<20 && arr[i].members!=0){
-		printf("in search group== %s.\n",arr[i].grp_name);
 		if(strcmp(arr[i].grp_name,ch)==0){
 			return i;
 		}
@@ -105,7 +103,6 @@ void add_user(struct node *arr,char *user_id,int type,char of){
 }
 
 int add_grp(struct grp *arr,char *grp_name){
-	printf("in add group function\n");
 	int i=0;
 	while(i<20 && arr[i].members!=0){
 		if(strcmp(arr[i].grp_name,grp_name)==0){
@@ -114,7 +111,6 @@ int add_grp(struct grp *arr,char *grp_name){
 		i++;
 	}
 	strcpy(arr[i].grp_name,grp_name);
-	printf("returning from add_grp function\n");
 	return i;
 }
 
@@ -169,6 +165,18 @@ void mark_offline(struct node *arr,char *sender){
 	while(i<100 && arr[i].type!=-1){
 		if(arr[i].type==sender_type){
 			arr[i].of='x';
+		}
+		i++;
+	}
+}
+
+void mark_online(struct node *arr,char *sender){
+	int sender_type=search_user(arr,sender);
+	int i=0;
+	while(i<100 && arr[i].type!=-1){
+		if(arr[i].type==sender_type){
+			arr[i].of='o';
+			break;
 		}
 		i++;
 	}
@@ -317,10 +325,6 @@ int main(){
 				exit(0);
 			}
 
-			for(int i=0;i<20;i++){
-				printf("%d\n",node_grp_arr2[i].members);
-			}
-
 			//***********shared memory attachment done*************
 
 			//variables
@@ -349,6 +353,7 @@ int main(){
 				add_user(node_arr2,msg,userType,'o');
 			}
 			else{
+				mark_online(node_arr2,msg);
 				userType=searchU;
 			}
 
