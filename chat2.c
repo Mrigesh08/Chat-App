@@ -437,7 +437,9 @@ int main(){
 									node_grp_arr2[grp_index].members=set_union(node_grp_arr2[grp_index].members,make_set_from_index(user));
 								}
 								pch=strtok(NULL, ":");
-								pch=trim(pch);
+								if(pch!=NULL){
+									pch=trim(pch);
+								}
 								printf("user in group= %s\n",pch);
 							}
 
@@ -452,6 +454,7 @@ int main(){
 						if(grp_num!=-1){
 							pch = strtok (NULL, ":");
 							pch=trim(pch);
+							printf("group : %s\n",pch);
 							message_to_grp(node_grp_arr2[grp_num].members,child_user_id,pch,msgid);
 						}
 						else if(send_to_type!=-1){
