@@ -72,6 +72,7 @@ struct node *make_node(char *user_id,int type,char of){
 int search_user(struct node *arr,char *ch){
 	int i=0;
 	while(i<100 && arr[i].type!=-1){
+		printf("in search user== %s.\n",arr[i].user_id);
 		if(strcmp(arr[i].user_id,ch)==0){
 			return arr[i].type;
 		}
@@ -84,6 +85,7 @@ int search_user(struct node *arr,char *ch){
 int search_grp(struct grp *arr,char *ch){
 	int i=0;
 	while(i<20 && arr[i].members!=0){
+		printf("in search group== %s.\n",arr[i].grp_name);
 		if(strcmp(arr[i].grp_name,ch)==0){
 			return i;
 		}
@@ -103,6 +105,7 @@ void add_user(struct node *arr,char *user_id,int type,char of){
 }
 
 int add_grp(struct grp *arr,char *grp_name){
+	printf("in add group function\n");
 	int i=0;
 	while(i<20 && arr[i].members!=0){
 		if(strcmp(arr[i].grp_name,grp_name)==0){
@@ -111,6 +114,7 @@ int add_grp(struct grp *arr,char *grp_name){
 		i++;
 	}
 	strcpy(arr[i].grp_name,grp_name);
+	printf("returning from add_grp function\n");
 	return i;
 }
 
@@ -165,6 +169,7 @@ void mark_offline(struct node *arr,char *sender){
 	while(i<100 && arr[i].type!=-1){
 		if(arr[i].type==sender_type){
 			arr[i].of='x';
+			break;
 		}
 		i++;
 	}
@@ -180,6 +185,46 @@ void mark_online(struct node *arr,char *sender){
 		}
 		i++;
 	}
+}
+
+char * trim(char *ch){
+	char *temp=(char *)malloc(sizeof(char)*20);
+	int i=0;
+	while(ch[i]==' '){
+		i++;
+	}
+	int j=strlen(ch)-1;
+	while(ch[j]==' '){
+		j--;
+	}
+	int k=0;
+	while(i<=j){
+		temp[k]=ch[i];
+		k++;
+		i++;
+	}
+	temp[k]='\0';
+	return temp;
+}
+
+char * trim(char *ch){
+	char *temp=(char *)malloc(sizeof(char)*20);
+	int i=0;
+	while(ch[i]==' '){
+		i++;
+	}
+	int j=strlen(ch)-1;
+	while(ch[j]==' '){
+		j--;
+	}
+	int k=0;
+	while(i<=j){
+		temp[k]=ch[i];
+		k++;
+		i++;
+	}
+	temp[k]='\0';
+	return temp;
 }
 
 int main(){
@@ -234,7 +279,7 @@ int main(){
 
 	//************creating shared memory*************
 
-	key_shm = ftok("/bin/bash",65);
+	key_shm = ftok("shmfile",65);
 	if(key_shm<0){
 		printf("error in ftok %d\n",key_shm);
 	}
@@ -251,7 +296,7 @@ int main(){
 	}
 	printf("%p\n",node_arr);
 
-	key_shm_grp = ftok("/bin/ls",65);
+	key_shm_grp = ftok("groupfile",65);
 	if(key_shm_grp<0){
 		printf("error in ftok %d\n",key_shm_grp);
 	}
@@ -341,11 +386,12 @@ int main(){
 			struct node *n;
 
 			//asking for user_name
-			bzero(msg,BUFSIZE);
+			bzero(&msg,BUFSIZE);
 			strcpy(msg,"enter your username");
 			send (clientSocket, msg, strlen(msg), 0);
-			bzero(msg,BUFSIZE);
+			bzero(&msg,BUFSIZE);
 			recv (clientSocket, msg, BUFSIZE-1, 0);
+			printf("client username is %s.\n",msg);
 			searchU=search_user(node_arr2,msg);
 			if(searchU==-1){
 				kill(getppid(),SIGUSR1);			
@@ -370,7 +416,7 @@ int main(){
 			while(1){
 
 				//non blocking sending process
-				non_block_recv=recv (clientSocket, msg1, BUFSIZE-1, MSG_DONTWAIT);
+				non_block_recv=recv(clientSocket, msg1, BUFSIZE-1, MSG_DONTWAIT);
 
 				if(non_block_recv<0 && (errno==EWOULDBLOCK || errno==EAGAIN)){
 					//do nothing(nothing is received from the client)
@@ -391,7 +437,8 @@ int main(){
 					}
 					printf("message received is: %s\n",msg1);
 					pch = strtok (msg1,":");
-					printf("first token : %s.\n",pch);
+					pch=trim(pch);
+					//printf("first token : %s\n",pch);
 					//send_to=pch;
 					if(strncmp(pch,"broad",5)==0){
 						pch = strtok (NULL, ":");
@@ -400,21 +447,22 @@ int main(){
 					else if(strncmp(pch,"mk_grp",6)==0){
 						int user,grp_index;
 						pch = strtok (NULL, ":");
-						printf("group name =%s\n",pch);
+						pch=trim(pch);
+						//printf("group name =%s\n",pch);
 
 						if((grp_index=add_grp(node_grp_arr2,pch))!=-1){
 
 							send_to_type=search_user(node_arr2,child_user_id);
 							node_grp_arr2[grp_index].members=set_union(node_grp_arr2[grp_index].members,make_set_from_index(send_to_type));
 							pch = strtok (NULL, ":");
-							printf("user in group= %s\n",pch);
+							pch=trim(pch);
 							while(pch!=NULL){
 								user=search_user(node_arr2,pch);
 								if(user!=-1){
 									node_grp_arr2[grp_index].members=set_union(node_grp_arr2[grp_index].members,make_set_from_index(user));
 								}
 								pch=strtok(NULL, ":");
-								printf("user in group= %s\n",pch);
+								pch=trim(pch);
 							}
 
 						}
@@ -427,15 +475,17 @@ int main(){
 						send_to_type=search_user(node_arr2,pch);
 						if(grp_num!=-1){
 							pch = strtok (NULL, ":");
+							pch=trim(pch);
 							message_to_grp(node_grp_arr2[grp_num].members,child_user_id,pch,msgid);
 						}
 						else if(send_to_type!=-1){
 							pch = strtok (NULL, ":");
+							pch=trim(pch);
 							mf.mtype=send_to_type;
 							strcpy(mf.mtext,pch);
 							strcpy(mf.sender_id,child_user_id);
 							msgsnd(msgid, &mf, sizeof(mf), IPC_NOWAIT);
-							bzero(msg1,BUFSIZE);
+							bzero(&msg1,BUFSIZE);
 						}
 						else{
 							send (clientSocket, "no such user or group", strlen("no such user or group")+1, 0);
@@ -456,7 +506,7 @@ int main(){
 					else{
 						msg_to_client=(char *)malloc(sizeof(mf1.sender_id)+sizeof(mf1.mtext)+sizeof(char)*4);
 						sprintf(msg_to_client,"%s : %s",mf1.sender_id,mf1.mtext);
-						send (clientSocket, msg_to_client, strlen(msg_to_client), 0);
+						send (clientSocket, msg_to_client, strlen(msg_to_client)+1, 0);
 					}
 				}
 
