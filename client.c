@@ -12,16 +12,18 @@ void print_instructions(){
 	printf("************************************************\n");
 	printf("enter your USERNAME when asked(max 20 characters)\n");
 	printf("to get all user list use 'get_users' command\n");
+	printf("Status 'o' means user is online and 'x' means that the user if offline\n");
 	printf("to exit the chat system use 'exit' command\n");
-	printf("to send message to a particular user '<username:message>' username and colon without space\n");
+	printf("to send message to a particular user '<username:message>' username and colon\n");
 	printf("\t eg=> user1: hello\n");
 	printf("to broadcast a message use command 'broad'\n");
 	printf("\t eg=> broad: hello\n");
 	printf("to make a group use 'mk_grp' command\n");
-	printf("\t mk_grp:<group_name>:<user_list> (without spaces)\n");
+	printf("\t mk_grp:<group_name>:<user_list>\n");
 	printf("\t eg=> mk_grp:group1:user1:user2:user3\n");
 	printf("to send message to a group of users '<group_name>: <message>'\n");
 	printf("\t eg=> group1: hello\n\n");
+	printf("NOTE: Press ENTER to see if any new messages have been received\n");
 	printf("************************************************\n");
 }
 
