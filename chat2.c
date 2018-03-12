@@ -182,6 +182,26 @@ void mark_online(struct node *arr,char *sender){
 	}
 }
 
+char * trim(char *ch){
+	char *temp=(char *)malloc(sizeof(char)*100);
+	int i=0;
+	while(ch[i]==' '){
+		i++;
+	}
+	int j=strlen(ch)-1;
+	while(ch[j]==' '){
+		j--;
+	}
+	int k=0;
+	while(i<=j){
+		temp[k]=ch[i];
+		k++;
+		i++;
+	}
+	temp[k]='\0';
+	return temp;
+}
+
 int main(){
 
 	int serverSocket;
@@ -391,6 +411,7 @@ int main(){
 					}
 					printf("message received is: %s\n",msg1);
 					pch = strtok (msg1,":");
+					pch=trim(pch);
 					printf("first token : %s.\n",pch);
 					//send_to=pch;
 					if(strncmp(pch,"broad",5)==0){
@@ -400,6 +421,7 @@ int main(){
 					else if(strncmp(pch,"mk_grp",6)==0){
 						int user,grp_index;
 						pch = strtok (NULL, ":");
+						pch=trim(pch);
 						printf("group name =%s\n",pch);
 
 						if((grp_index=add_grp(node_grp_arr2,pch))!=-1){
@@ -407,6 +429,7 @@ int main(){
 							send_to_type=search_user(node_arr2,child_user_id);
 							node_grp_arr2[grp_index].members=set_union(node_grp_arr2[grp_index].members,make_set_from_index(send_to_type));
 							pch = strtok (NULL, ":");
+							pch=trim(pch);
 							printf("user in group= %s\n",pch);
 							while(pch!=NULL){
 								user=search_user(node_arr2,pch);
@@ -414,6 +437,7 @@ int main(){
 									node_grp_arr2[grp_index].members=set_union(node_grp_arr2[grp_index].members,make_set_from_index(user));
 								}
 								pch=strtok(NULL, ":");
+								pch=trim(pch);
 								printf("user in group= %s\n",pch);
 							}
 
@@ -427,10 +451,12 @@ int main(){
 						send_to_type=search_user(node_arr2,pch);
 						if(grp_num!=-1){
 							pch = strtok (NULL, ":");
+							pch=trim(pch);
 							message_to_grp(node_grp_arr2[grp_num].members,child_user_id,pch,msgid);
 						}
 						else if(send_to_type!=-1){
 							pch = strtok (NULL, ":");
+							pch=trim(pch);
 							mf.mtype=send_to_type;
 							strcpy(mf.mtext,pch);
 							strcpy(mf.sender_id,child_user_id);
