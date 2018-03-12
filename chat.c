@@ -412,7 +412,7 @@ int main(){
 					printf("message received is: %s\n",msg1);
 					pch = strtok (msg1,":");
 					pch=trim(pch);
-					printf("first token : %s.\n",pch);
+					// printf("first token : %s.\n",pch);
 					//send_to=pch;
 					if(strncmp(pch,"broad",5)==0){
 						pch = strtok (NULL, ":");
@@ -454,7 +454,7 @@ int main(){
 						if(grp_num!=-1){
 							pch = strtok (NULL, ":");
 							pch=trim(pch);
-							printf("group : %s\n",pch);
+							// printf("group : %s\n",pch);
 							message_to_grp(node_grp_arr2[grp_num].members,child_user_id,pch,msgid);
 						}
 						else if(send_to_type!=-1){
